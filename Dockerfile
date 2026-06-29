@@ -1,7 +1,6 @@
 FROM wordpress:php8.2-apache
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+COPY wp-content /var/www/html/wp-content
+COPY wp-config.php /var/www/html/wp-config.php
 
-COPY . /var/www/html/
-
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html/wp-content
