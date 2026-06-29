@@ -1,6 +1,8 @@
 FROM wordpress:php8.2-apache
 
-COPY wp-content /var/www/html/wp-content
-COPY wp-config.php /var/www/html/wp-config.php
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
+          /etc/apache2/mods-enabled/mpm_*.conf \
+    && a2enmod mpm_prefork rewrite
 
-RUN chown -R www-data:www-data /var/www/html/wp-content /var/www/html/wp-config.php
+COPY wp-content /usr/src/wordpress/wp-content
+COPY wp-config.php /usr/src/wordpress/wp-config.php
