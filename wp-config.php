@@ -32,15 +32,17 @@
 //define( 'DB_HOST', 'localhost' );
 
 /** Database charset to use in creating database tables. */
-//define( 'DB_CHARSET', 'utf8mb4' );
+define( 'DB_CHARSET', 'utf8mb4' );
 
 /** The database collate type. Don't change this if in doubt. */
-//define( 'DB_COLLATE', '' );
+define( 'DB_COLLATE', '' );
 
 define('DB_NAME', getenv('MYSQLDATABASE'));
 define('DB_USER', getenv('MYSQLUSER'));
 define('DB_PASSWORD', getenv('MYSQLPASSWORD'));
 define('DB_HOST', getenv('MYSQLHOST') . ':' . getenv('MYSQLPORT'));
+define('WP_HOME', getenv('WP_HOME') ?: 'https://pubadwebrevamp-production.up.railway.app/');
+define('WP_SITEURL', getenv('WP_SITEURL') ?: 'https://pubadwebrevamp-production.up.railway.app/');
 
 /**#@+
  * Authentication unique keys and salts.
