@@ -744,7 +744,7 @@ body.nav-is-fixed {
 	position: fixed;
 	right: 24px;
 	bottom: 54px;
-	z-index: 50;
+	z-index: 300;
 }
 .ai-assistant {
 	display: flex;
