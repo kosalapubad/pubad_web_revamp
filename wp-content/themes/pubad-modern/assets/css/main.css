@@ -791,6 +791,9 @@ body.nav-is-fixed {
 	border-radius: 10px;
 	box-shadow: 0 18px 50px rgba(0, 31, 70, .26);
 }
+.ai-chat__panel[hidden] {
+	display: none;
+}
 .ai-chat__header {
 	display: flex;
 	align-items: center;
