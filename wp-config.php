@@ -41,8 +41,12 @@ define('DB_NAME', getenv('MYSQLDATABASE'));
 define('DB_USER', getenv('MYSQLUSER'));
 define('DB_PASSWORD', getenv('MYSQLPASSWORD'));
 define('DB_HOST', getenv('MYSQLHOST') . ':' . getenv('MYSQLPORT'));
-define('WP_HOME', getenv('WP_HOME') ?: 'https://pubadwebrevamp-production.up.railway.app/');
-define('WP_SITEURL', getenv('WP_SITEURL') ?: 'https://pubadwebrevamp-production.up.railway.app/');
+define('WP_HOME', 'https://pubadwebrevamp-production.up.railway.app');
+define('WP_SITEURL', 'https://pubadwebrevamp-production.up.railway.app');
+
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+    $_SERVER['HTTPS'] = 'on';
+}
 
 /**#@+
  * Authentication unique keys and salts.
