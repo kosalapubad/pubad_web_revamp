@@ -11,6 +11,279 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'PUBAD_MODERN_VERSION', '1.0.0' );
 
+function pubad_modern_supported_languages() {
+	return array(
+		'en' => array(
+			'label'  => 'English',
+			'native' => 'English',
+			'locale' => 'en_US',
+		),
+		'si' => array(
+			'label'  => 'Sinhala',
+			'native' => 'සිංහල',
+			'locale' => 'si_LK',
+		),
+		'ta' => array(
+			'label'  => 'Tamil',
+			'native' => 'தமிழ்',
+			'locale' => 'ta_LK',
+		),
+	);
+}
+
+function pubad_modern_current_language() {
+	$languages = pubad_modern_supported_languages();
+	$lang      = '';
+
+	if ( isset( $_GET['pubad_lang'] ) ) {
+		$lang = sanitize_key( wp_unslash( $_GET['pubad_lang'] ) );
+	} elseif ( isset( $_COOKIE['pubad_lang'] ) ) {
+		$lang = sanitize_key( wp_unslash( $_COOKIE['pubad_lang'] ) );
+	}
+
+	return isset( $languages[ $lang ] ) ? $lang : 'en';
+}
+
+function pubad_modern_set_language_cookie() {
+	if ( ! isset( $_GET['pubad_lang'] ) ) {
+		return;
+	}
+
+	$lang      = sanitize_key( wp_unslash( $_GET['pubad_lang'] ) );
+	$languages = pubad_modern_supported_languages();
+
+	if ( ! isset( $languages[ $lang ] ) ) {
+		return;
+	}
+
+	setcookie(
+		'pubad_lang',
+		$lang,
+		array(
+			'expires'  => time() + MONTH_IN_SECONDS,
+			'path'     => COOKIEPATH ? COOKIEPATH : '/',
+			'domain'   => COOKIE_DOMAIN ? COOKIE_DOMAIN : '',
+			'secure'   => is_ssl(),
+			'httponly' => true,
+			'samesite' => 'Lax',
+		)
+	);
+	$_COOKIE['pubad_lang'] = $lang;
+}
+add_action( 'init', 'pubad_modern_set_language_cookie', 1 );
+
+function pubad_modern_language_url( $lang ) {
+	$url = remove_query_arg( 'pubad_lang' );
+	return esc_url( add_query_arg( 'pubad_lang', sanitize_key( $lang ), $url ) );
+}
+
+function pubad_modern_locale( $locale ) {
+	$languages = pubad_modern_supported_languages();
+	$lang      = pubad_modern_current_language();
+
+	return isset( $languages[ $lang ] ) ? $languages[ $lang ]['locale'] : $locale;
+}
+add_filter( 'locale', 'pubad_modern_locale' );
+
+function pubad_modern_translation_dictionary() {
+	return array(
+		'si' => array(
+			'Skip to content' => 'අන්තර්ගතයට යන්න',
+			'Government of Sri Lanka' => 'ශ්‍රී ලංකා රජය',
+			'Language' => 'භාෂාව',
+			'English' => 'ඉංග්‍රීසි',
+			'Sinhala' => 'සිංහල',
+			'Tamil' => 'தமிழ்',
+			'Search' => 'සොයන්න',
+			'Search...' => 'සොයන්න...',
+			'Government of Sri Lanka Logo' => 'ශ්‍රී ලංකා රජයේ ලාංඡනය',
+			'Ministry of' => 'අමාත්‍යාංශය',
+			'Public Administration' => 'රාජ්‍ය පරිපාලන',
+			'Sri Lanka' => 'ශ්‍රී ලංකාව',
+			'Call Us' => 'අමතන්න',
+			'Email Us' => 'විද්‍යුත් තැපෑල',
+			'Our Location' => 'අපගේ ස්ථානය',
+			'Independence Square, Colombo 07, Sri Lanka' => 'නිදහස් චතුරශ්‍රය, කොළඹ 07, ශ්‍රී ලංකාව',
+			'Primary navigation' => 'ප්‍රධාන සංචාලනය',
+			'Menu' => 'මෙනුව',
+			'About Us' => 'අප ගැන',
+			'Divisions' => 'අංශ',
+			'Services' => 'සේවා',
+			'Circulars' => 'චක්‍රලේඛ',
+			'Notices' => 'දැන්වීම්',
+			'Right to Information' => 'තොරතුරු දැනගැනීමේ අයිතිය',
+			'Training' => 'පුහුණු',
+			'Publications' => 'ප්‍රකාශන',
+			'Contact Us' => 'අප අමතන්න',
+			'Bungalow Booking' => 'බංගලා වෙන්කිරීම',
+			'Latest Updates' => 'නවතම යාවත්කාලීන',
+			'New' => 'නව',
+			'View All Updates' => 'සියලු යාවත්කාලීන බලන්න',
+			'Quick access' => 'ඉක්මන් ප්‍රවේශය',
+			'Forms' => 'පෝරම',
+			'Downloads' => 'බාගත කිරීම්',
+			'Profiles' => 'පැතිකඩ',
+			'More Profiles' => 'තවත් පැතිකඩ',
+			'View All' => 'සියල්ල බලන්න',
+			'News' => 'පුවත්',
+			'Latest Circulars' => 'නවතම චක්‍රලේඛ',
+			'Quick Links' => 'ඉක්මන් සබැඳි',
+			'Related Institutions' => 'අදාළ ආයතන',
+			'View All Institutions' => 'සියලු ආයතන බලන්න',
+			'Important Links' => 'වැදගත් සබැඳි',
+			'Other Links' => 'වෙනත් සබැඳි',
+			'Committed to building an efficient, effective and people-friendly public service for the nation.' => 'ජාතිය වෙනුවෙන් කාර්යක්ෂම, ඵලදායී සහ ජනහිතකාමී රාජ්‍ය සේවාවක් ගොඩනැගීමට කැපවී සිටී.',
+			'Ministry of Public Administration, Provincial Councils and Local Government. All Rights Reserved.' => 'රාජ්‍ය පරිපාලන, පළාත් සභා සහ පළාත් පාලන අමාත්‍යාංශය. සියලු හිමිකම් ඇවිරිණි.',
+			'Privacy Policy' => 'පෞද්ගලිකත්ව ප්‍රතිපත්තිය',
+			'Terms of Use' => 'භාවිත නියම',
+			'AI Assistant' => 'AI සහායක',
+			'Ministry help desk' => 'අමාත්‍යාංශ සහාය',
+			'How can I help you?' => 'මට ඔබට කෙසේ සහාය විය හැකිද?',
+			'Close chat' => 'සංවාදය වසන්න',
+			'Suggested questions' => 'යෝජිත ප්‍රශ්න',
+			'Contact details' => 'සම්බන්ධතා විස්තර',
+			'Office hours' => 'කාර්යාල වේලාවන්',
+			'Ask the assistant' => 'සහායකගෙන් විමසන්න',
+			'Type your question...' => 'ඔබගේ ප්‍රශ්නය ටයිප් කරන්න...',
+			'Send' => 'යවන්න',
+			'Learn More' => 'වැඩිදුර දැනගන්න',
+			'Transforming Public Service for a Better Tomorrow' => 'හොඳ හෙටක් සඳහා රාජ්‍ය සේවාව පරිවර්තනය කිරීම',
+			'Driving excellence in public administration for an efficient, transparent and people-centric public service.' => 'කාර්යක්ෂම, විනිවිද පෙනෙන සහ ජනකේන්ද්‍රීය රාජ්‍ය සේවාවක් සඳහා රාජ්‍ය පරිපාලනයේ විශිෂ්ටත්වය ප්‍රවර්ධනය කිරීම.',
+			'Mon - Fri 8.30 AM - 4.30 PM' => 'සඳුදා - සිකුරාදා පෙ.ව. 8.30 - ප.ව. 4.30',
+			'Home' => 'මුල් පිටුව',
+			'Sitemap' => 'අඩවි සිතියම',
+			'Webmail' => 'වෙබ් තැපෑල',
+			'Employee Login' => 'සේවක පිවිසුම',
+			'Grievance Handling' => 'පැමිණිලි කළමනාකරණය',
+			'Feedback' => 'ප්‍රතිචාර',
+			'MAY' => 'මැයි',
+			'Special Circular on Pension Anomaly - 2024' => 'විශ්‍රාම වැටුප් විෂමතාව පිළිබඳ විශේෂ චක්‍රලේඛය - 2024',
+			'Guidelines on Leave Management System' => 'නිවාඩු කළමනාකරණ පද්ධතිය පිළිබඳ මාර්ගෝපදේශ',
+			'Procedure for Online Bungalow Reservations' => 'මාර්ගගත බංගලා වෙන්කිරීම් ක්‍රියා පටිපාටිය',
+			'Management Services Division' => 'කළමනාකරණ සේවා අංශය',
+			'Establishments Division' => 'ආයතන අංශය',
+			'Public Service Division' => 'රාජ්‍ය සේවා අංශය',
+			'Provincial Councils Division' => 'පළාත් සභා අංශය',
+			'Local Government Division' => 'පළාත් පාලන අංශය',
+			'Administration & Finance Division' => 'පරිපාලන හා මුදල් අංශය',
+			'Right to Information (RTI)' => 'තොරතුරු දැනගැනීමේ අයිතිය (RTI)',
+			'Procurement Notices' => 'ප්‍රසම්පාදන දැන්වීම්',
+			'Tenders' => 'ටෙන්ඩර්',
+			'Download Forms' => 'පෝරම බාගත කිරීම',
+			'Vacancies' => 'පුරප්පාඩු',
+			'Acts & Regulations' => 'පනත් සහ රෙගුලාසි',
+			'FAQs' => 'නිතර අසන ප්‍රශ්න',
+		),
+		'ta' => array(
+			'Skip to content' => 'உள்ளடக்கத்திற்குச் செல்லவும்',
+			'Government of Sri Lanka' => 'இலங்கை அரசு',
+			'Language' => 'மொழி',
+			'English' => 'English',
+			'Sinhala' => 'සිංහල',
+			'Tamil' => 'தமிழ்',
+			'Search' => 'தேடல்',
+			'Search...' => 'தேடவும்...',
+			'Government of Sri Lanka Logo' => 'இலங்கை அரசின் இலச்சினை',
+			'Ministry of' => 'அமைச்சு',
+			'Public Administration' => 'பொது நிர்வாகம்',
+			'Sri Lanka' => 'இலங்கை',
+			'Call Us' => 'அழைக்கவும்',
+			'Email Us' => 'மின்னஞ்சல்',
+			'Our Location' => 'எங்கள் இருப்பிடம்',
+			'Independence Square, Colombo 07, Sri Lanka' => 'சுதந்திர சதுக்கம், கொழும்பு 07, இலங்கை',
+			'Primary navigation' => 'முதன்மை வழிசெலுத்தல்',
+			'Menu' => 'பட்டி',
+			'About Us' => 'எங்களை பற்றி',
+			'Divisions' => 'பிரிவுகள்',
+			'Services' => 'சேவைகள்',
+			'Circulars' => 'சுற்றறிக்கைகள்',
+			'Notices' => 'அறிவித்தல்கள்',
+			'Right to Information' => 'தகவல் அறியும் உரிமை',
+			'Training' => 'பயிற்சி',
+			'Publications' => 'வெளியீடுகள்',
+			'Contact Us' => 'தொடர்பு கொள்ளுங்கள்',
+			'Bungalow Booking' => 'பங்களா முன்பதிவு',
+			'Latest Updates' => 'சமீபத்திய புதுப்பிப்புகள்',
+			'New' => 'புதியது',
+			'View All Updates' => 'அனைத்து புதுப்பிப்புகளையும் பார்க்க',
+			'Quick access' => 'விரைவு அணுகல்',
+			'Forms' => 'படிவங்கள்',
+			'Downloads' => 'பதிவிறக்கங்கள்',
+			'Profiles' => 'சுயவிவரங்கள்',
+			'More Profiles' => 'மேலும் சுயவிவரங்கள்',
+			'View All' => 'அனைத்தையும் பார்க்க',
+			'News' => 'செய்திகள்',
+			'Latest Circulars' => 'சமீபத்திய சுற்றறிக்கைகள்',
+			'Quick Links' => 'விரைவு இணைப்புகள்',
+			'Related Institutions' => 'தொடர்புடைய நிறுவனங்கள்',
+			'View All Institutions' => 'அனைத்து நிறுவனங்களையும் பார்க்க',
+			'Important Links' => 'முக்கிய இணைப்புகள்',
+			'Other Links' => 'பிற இணைப்புகள்',
+			'Committed to building an efficient, effective and people-friendly public service for the nation.' => 'நாட்டிற்காக திறமையான, பயனுள்ள மற்றும் மக்கள் நட்பு பொது சேவையை உருவாக்க அர்ப்பணிக்கப்பட்டுள்ளது.',
+			'Ministry of Public Administration, Provincial Councils and Local Government. All Rights Reserved.' => 'பொது நிர்வாக, மாகாண சபைகள் மற்றும் உள்ளூராட்சி அமைச்சு. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.',
+			'Privacy Policy' => 'தனியுரிமைக் கொள்கை',
+			'Terms of Use' => 'பயன்பாட்டு விதிமுறைகள்',
+			'AI Assistant' => 'AI உதவியாளர்',
+			'Ministry help desk' => 'அமைச்சு உதவி மையம்',
+			'How can I help you?' => 'நான் எவ்வாறு உதவலாம்?',
+			'Close chat' => 'அரட்டையை மூடு',
+			'Suggested questions' => 'பரிந்துரைக்கப்பட்ட கேள்விகள்',
+			'Contact details' => 'தொடர்பு விவரங்கள்',
+			'Office hours' => 'அலுவலக நேரம்',
+			'Ask the assistant' => 'உதவியாளரிடம் கேளுங்கள்',
+			'Type your question...' => 'உங்கள் கேள்வியைத் தட்டச்சு செய்யவும்...',
+			'Send' => 'அனுப்பு',
+			'Learn More' => 'மேலும் அறிக',
+			'Transforming Public Service for a Better Tomorrow' => 'சிறந்த நாளைக்காக பொது சேவையை மாற்றுதல்',
+			'Driving excellence in public administration for an efficient, transparent and people-centric public service.' => 'திறமையான, வெளிப்படையான மற்றும் மக்கள் மையமான பொது சேவைக்காக பொது நிர்வாகத்தில் சிறப்பை முன்னெடுத்தல்.',
+			'Mon - Fri 8.30 AM - 4.30 PM' => 'திங்கள் - வெள்ளி காலை 8.30 - மாலை 4.30',
+			'Home' => 'முகப்பு',
+			'Sitemap' => 'தள வரைபடம்',
+			'Webmail' => 'வலை அஞ்சல்',
+			'Employee Login' => 'பணியாளர் உள்நுழைவு',
+			'Grievance Handling' => 'குறை தீர்வு',
+			'Feedback' => 'கருத்து',
+			'MAY' => 'மே',
+			'Special Circular on Pension Anomaly - 2024' => 'ஓய்வூதிய முரண்பாடு குறித்த சிறப்பு சுற்றறிக்கை - 2024',
+			'Guidelines on Leave Management System' => 'விடுப்பு மேலாண்மை அமைப்புக்கான வழிகாட்டுதல்கள்',
+			'Procedure for Online Bungalow Reservations' => 'இணைய பங்களா முன்பதிவுகளுக்கான நடைமுறை',
+			'Management Services Division' => 'மேலாண்மை சேவைகள் பிரிவு',
+			'Establishments Division' => 'நிறுவனங்கள் பிரிவு',
+			'Public Service Division' => 'பொது சேவை பிரிவு',
+			'Provincial Councils Division' => 'மாகாண சபைகள் பிரிவு',
+			'Local Government Division' => 'உள்ளூராட்சி பிரிவு',
+			'Administration & Finance Division' => 'நிர்வாகம் மற்றும் நிதி பிரிவு',
+			'Right to Information (RTI)' => 'தகவல் அறியும் உரிமை (RTI)',
+			'Procurement Notices' => 'கொள்முதல் அறிவித்தல்கள்',
+			'Tenders' => 'டெண்டர்கள்',
+			'Download Forms' => 'படிவங்களை பதிவிறக்கவும்',
+			'Vacancies' => 'வேலைவாய்ப்புகள்',
+			'Acts & Regulations' => 'சட்டங்கள் மற்றும் விதிமுறைகள்',
+			'FAQs' => 'அடிக்கடி கேட்கப்படும் கேள்விகள்',
+		),
+	);
+}
+
+function pubad_modern_translate_text( $translation, $text, $domain ) {
+	if ( 'pubad-modern' !== $domain ) {
+		return $translation;
+	}
+
+	$lang = pubad_modern_current_language();
+	if ( 'en' === $lang ) {
+		return $translation;
+	}
+
+	$dictionary = pubad_modern_translation_dictionary();
+	return isset( $dictionary[ $lang ][ $text ] ) ? $dictionary[ $lang ][ $text ] : $translation;
+}
+add_filter( 'gettext', 'pubad_modern_translate_text', 10, 3 );
+
+function pubad_modern_translate_menu_title( $title ) {
+	return pubad_modern_translate_text( $title, wp_strip_all_tags( $title ), 'pubad-modern' );
+}
+add_filter( 'nav_menu_item_title', 'pubad_modern_translate_menu_title' );
+
 function pubad_modern_setup() {
 	load_theme_textdomain( 'pubad-modern', get_template_directory() . '/languages' );
 

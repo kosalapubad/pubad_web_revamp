@@ -15,6 +15,10 @@
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <a class="skip-link" href="#content"><?php esc_html_e( 'Skip to content', 'pubad-modern' ); ?></a>
+<?php
+$pubad_languages = pubad_modern_supported_languages();
+$pubad_lang      = pubad_modern_current_language();
+?>
 
 <header class="site-header">
 	<div class="gov-bar">
@@ -22,19 +26,22 @@
 			<div class="gov-bar__left">
 				<span class="mini-emblem"></span>
 				<span><?php esc_html_e( 'Government of Sri Lanka', 'pubad-modern' ); ?></span>
-				<a href="#"><?php esc_html_e( 'සිංහල', 'pubad-modern' ); ?></a>
-				<a href="#"><?php esc_html_e( 'தமிழ்', 'pubad-modern' ); ?></a>
+				<a class="<?php echo 'si' === $pubad_lang ? 'is-active' : ''; ?>" href="<?php echo pubad_modern_language_url( 'si' ); ?>"><?php echo esc_html( $pubad_languages['si']['native'] ); ?></a>
+				<a class="<?php echo 'ta' === $pubad_lang ? 'is-active' : ''; ?>" href="<?php echo pubad_modern_language_url( 'ta' ); ?>"><?php echo esc_html( $pubad_languages['ta']['native'] ); ?></a>
 			</div>
 			<div class="gov-bar__tools">
 				<button type="button" data-font="down">A-</button>
 				<button type="button" data-font="reset">A</button>
 				<button type="button" data-font="up">A+</button>
-				<select aria-label="<?php esc_attr_e( 'Language', 'pubad-modern' ); ?>">
-					<option><?php esc_html_e( 'English', 'pubad-modern' ); ?></option>
-					<option><?php esc_html_e( 'Sinhala', 'pubad-modern' ); ?></option>
-					<option><?php esc_html_e( 'Tamil', 'pubad-modern' ); ?></option>
+				<select data-language-select aria-label="<?php esc_attr_e( 'Language', 'pubad-modern' ); ?>">
+					<?php foreach ( $pubad_languages as $code => $language ) : ?>
+						<option value="<?php echo esc_url( pubad_modern_language_url( $code ) ); ?>" <?php selected( $pubad_lang, $code ); ?>>
+							<?php echo esc_html( $language['native'] ); ?>
+						</option>
+					<?php endforeach; ?>
 				</select>
 				<form role="search" method="get" class="top-search" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+					<input type="hidden" name="pubad_lang" value="<?php echo esc_attr( $pubad_lang ); ?>">
 					<label class="screen-reader-text" for="pubad-search"><?php esc_html_e( 'Search', 'pubad-modern' ); ?></label>
 					<input id="pubad-search" type="search" name="s" placeholder="<?php esc_attr_e( 'Search...', 'pubad-modern' ); ?>" value="<?php echo esc_attr( get_search_query() ); ?>">
 					<button type="submit"><?php echo pubad_modern_icon( 'search' ); ?></button>

@@ -8,9 +8,9 @@
 get_header();
 
 $updates = array(
-	array( '20', 'MAY', __( 'Special Circular on Pension Anomaly - 2024', 'pubad-modern' ) ),
-	array( '16', 'MAY', __( 'Guidelines on Leave Management System', 'pubad-modern' ) ),
-	array( '10', 'MAY', __( 'Procedure for Online Bungalow Reservations', 'pubad-modern' ) ),
+	array( '20', __( 'MAY', 'pubad-modern' ), __( 'Special Circular on Pension Anomaly - 2024', 'pubad-modern' ) ),
+	array( '16', __( 'MAY', 'pubad-modern' ), __( 'Guidelines on Leave Management System', 'pubad-modern' ) ),
+	array( '10', __( 'MAY', 'pubad-modern' ), __( 'Procedure for Online Bungalow Reservations', 'pubad-modern' ) ),
 );
 
 $quick_icons = array(

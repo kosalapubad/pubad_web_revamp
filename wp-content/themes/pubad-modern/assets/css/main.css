@@ -70,6 +70,11 @@ button, input, select { font: inherit; }
 .gov-bar__inner { justify-content: space-between; gap: 18px; }
 .gov-bar__left { gap: 18px; }
 .gov-bar__left a { opacity: .92; }
+.gov-bar__left a.is-active {
+	opacity: 1;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
 .mini-emblem {
 	width: 20px;
 	height: 26px;
