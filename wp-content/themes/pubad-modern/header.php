@@ -55,7 +55,7 @@ $pubad_lang      = pubad_modern_current_language();
 			<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
 				<img src="<?php echo pubad_modern_asset( 'government-logo.png' ); ?>" alt="<?php esc_attr_e( 'Government of Sri Lanka Logo', 'pubad-modern' ); ?>">
 				<span>
-					<strong><?php esc_html_e( 'Ministry of', 'pubad-modern' ); ?><br><?php esc_html_e( 'Public Administration, Provincial Councils and Local Government', 'pubad-modern' ); ?></strong>
+					<strong><?php esc_html_e( 'Ministry of Public Administration, Provincial Councils and Local Government', 'pubad-modern' ); ?></strong>
 					<em><?php esc_html_e( 'Sri Lanka', 'pubad-modern' ); ?></em>
 				</span>
 			</a>

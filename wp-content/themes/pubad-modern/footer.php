@@ -11,7 +11,7 @@
 	<div class="container footer-grid">
 		<div class="footer-brand">
 			<img src="<?php echo pubad_modern_asset( 'government-logo.png' ); ?>" alt="<?php esc_attr_e( 'Government of Sri Lanka Logo', 'pubad-modern' ); ?>">
-			<h2><?php esc_html_e( 'Ministry of', 'pubad-modern' ); ?><br><?php esc_html_e( 'Public Administration', 'pubad-modern' ); ?></h2>
+			<h2><?php esc_html_e( 'Ministry of Public Administration, Provincial Councils and Local Government', 'pubad-modern' ); ?></h2>
 			<p><?php esc_html_e( 'Sri Lanka', 'pubad-modern' ); ?></p>
 			<p><?php esc_html_e( 'Committed to building an efficient, effective and people-friendly public service for the nation.', 'pubad-modern' ); ?></p>
 			<div class="socials"><a href="#">f</a><a href="#">X</a><a href="#">▶</a><a href="#">in</a></div>
@@ -41,7 +41,7 @@
 			<header class="ai-chat__header">
 				<div>
 					<strong><?php esc_html_e( 'AI Assistant', 'pubad-modern' ); ?></strong>
-					<span><?php esc_html_e( 'Ministry help desk', 'pubad-modern' ); ?></span>
+					<span><?php esc_html_e( 'Ministry of Public Administration, Provincial Councils and Local Government help desk', 'pubad-modern' ); ?></span>
 				</div>
 				<button class="ai-chat__close" type="button" aria-label="<?php esc_attr_e( 'Close chat', 'pubad-modern' ); ?>">&times;</button>
 			</header>
