@@ -136,6 +136,8 @@ button, input, select { font: inherit; }
 	display: flex;
 	align-items: center;
 	gap: 24px;
+	min-width: 0;
+	max-width: 560px;
 	color: var(--blue-900);
 }
 .brand img {
@@ -145,15 +147,17 @@ button, input, select { font: inherit; }
 }
 .brand strong {
 	display: block;
-	font-size: 1.95rem;
-	line-height: 1.13;
+	max-width: 480px;
+	font-size: clamp(1.32rem, 2.1vw, 1.72rem);
+	line-height: 1.15;
 	font-weight: 700;
+	text-wrap: balance;
 }
 .brand em {
 	display: block;
 	margin-top: 2px;
 	font-style: normal;
-	font-size: 1.35rem;
+	font-size: clamp(1rem, 1.4vw, 1.18rem);
 }
 .contact-strip {
 	display: grid;
@@ -919,6 +923,12 @@ body.nav-is-fixed {
 
 @media (max-width: 1100px) {
 	.container { width: min(100% - 32px, 1200px); }
+	.brand {
+		max-width: 520px;
+	}
+	.brand strong {
+		font-size: clamp(1.2rem, 2.5vw, 1.48rem);
+	}
 	.contact-strip { gap: 20px; grid-template-columns: repeat(2, max-content); }
 	.contact-strip div:last-child { display: none; }
 	.primary-menu > li > a { padding: 0 10px; font-size: .86rem; }
@@ -968,17 +978,19 @@ body.nav-is-fixed {
 	.brand {
 		gap: 12px;
 		min-width: 0;
+		max-width: 100%;
 	}
 	.brand img {
 		width: 48px;
 		height: 64px;
 	}
 	.brand strong {
-		font-size: clamp(1.05rem, 5vw, 1.38rem);
-		line-height: 1.12;
+		max-width: none;
+		font-size: clamp(.98rem, 4.2vw, 1.22rem);
+		line-height: 1.16;
 	}
 	.brand em {
-		font-size: 1rem;
+		font-size: .9rem;
 	}
 	.contact-strip { display: none; }
 	.main-nav { height: auto; }
