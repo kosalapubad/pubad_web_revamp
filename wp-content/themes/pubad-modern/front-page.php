@@ -236,11 +236,31 @@ function pubad_modern_news_rows() {
 }
 
 function pubad_modern_doc_rows( $post_type, $fallback, $class ) {
-	$query = new WP_Query( array( 'post_type' => $post_type, 'posts_per_page' => 4 ) );
+	$query_args = array(
+		'post_type'      => $post_type,
+		'posts_per_page' => 4,
+	);
+
+	if ( 'circular' === $post_type && class_exists( 'Pubad_Circulars' ) ) {
+		$query_args['meta_key'] = Pubad_Circulars::META_DATE;
+		$query_args['orderby']  = 'meta_value';
+		$query_args['order']    = 'DESC';
+	}
+
+	$query = new WP_Query( $query_args );
 	if ( $query->have_posts() ) {
 		while ( $query->have_posts() ) {
 			$query->the_post();
-			echo '<a class="doc-row ' . esc_attr( $class ) . '" href="' . esc_url( get_permalink() ) . '">' . pubad_modern_icon( 'file' ) . '<span><b>' . esc_html( get_the_title() ) . '</b><em>' . esc_html( get_the_date() ) . '</em></span></a>';
+			$title = get_the_title();
+			$date  = get_the_date();
+
+			if ( 'circular' === $post_type && class_exists( 'Pubad_Circulars' ) ) {
+				$title  = Pubad_Circulars::get_localized_name( get_the_ID() );
+				$fields = Pubad_Circulars::get_fields( get_the_ID() );
+				$date   = $fields['date'] ? mysql2date( get_option( 'date_format' ), $fields['date'] ) : '';
+			}
+
+			echo '<a class="doc-row ' . esc_attr( $class ) . '" href="' . esc_url( get_permalink() ) . '">' . pubad_modern_icon( 'file' ) . '<span><b>' . esc_html( wp_trim_words( $title, 8, '...' ) ) . '</b><em>' . esc_html( $date ) . '</em></span></a>';
 		}
 		wp_reset_postdata();
 		return;
