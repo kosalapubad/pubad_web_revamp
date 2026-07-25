@@ -93,7 +93,8 @@ function pubad_modern_primary_fallback() {
 	$items = array( 'About Us', 'Divisions', 'Services', 'Circulars', 'Notices', 'Right to Information', 'Training', 'Publications', 'Contact Us' );
 	echo '<ul class="primary-menu">';
 	foreach ( $items as $item ) {
-		echo '<li><a href="#">' . esc_html__( $item, 'pubad-modern' ) . '</a></li>';
+		$url = 'Circulars' === $item ? pubad_modern_circulars_url() : '#';
+		echo '<li><a href="' . esc_url( $url ) . '">' . esc_html__( $item, 'pubad-modern' ) . '</a></li>';
 	}
 	echo '</ul>';
 }

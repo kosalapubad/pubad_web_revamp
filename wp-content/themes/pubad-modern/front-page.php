@@ -65,8 +65,8 @@ $hero_slides = pubad_modern_get_hero_slides();
 </section>
 
 <section class="quick-access container" aria-label="<?php esc_attr_e( 'Quick access', 'pubad-modern' ); ?>">
-	<?php foreach ( $quick_icons as $item ) : ?>
-		<a href="#" class="<?php echo 'calendar' === $item[0] ? 'is-orange' : ''; ?>">
+	<?php foreach ( $quick_icons as $index => $item ) : ?>
+		<a href="<?php echo 0 === $index ? pubad_modern_circulars_url() : '#'; ?>" class="<?php echo 'calendar' === $item[0] ? 'is-orange' : ''; ?>">
 			<?php echo pubad_modern_icon( $item[0] ); ?>
 			<span><?php echo esc_html( $item[1] ); ?></span>
 		</a>
@@ -91,7 +91,7 @@ $hero_slides = pubad_modern_get_hero_slides();
 	</div>
 
 	<div class="home-card">
-		<?php pubad_modern_card_header( __( 'Latest Circulars', 'pubad-modern' ) ); ?>
+		<?php pubad_modern_card_header( __( 'Latest Circulars', 'pubad-modern' ), pubad_modern_circulars_url() ); ?>
 		<?php pubad_modern_doc_rows( 'circular', array( 'Special Circular on Pension Anomaly - 2024', 'Implementation of Performance Management System - Circular', 'Guidelines on Leave Management System', 'Revised Policy on Overtime Payments' ), 'file-red' ); ?>
 	</div>
 
@@ -173,8 +173,8 @@ function pubad_modern_get_hero_slides() {
 	return $slides;
 }
 
-function pubad_modern_card_header( $title ) {
-	echo '<div class="card-title"><h2>' . esc_html( $title ) . '</h2><a href="#">' . esc_html__( 'View All', 'pubad-modern' ) . '</a></div>';
+function pubad_modern_card_header( $title, $url = '#' ) {
+	echo '<div class="card-title"><h2>' . esc_html( $title ) . '</h2><a href="' . esc_url( $url ) . '">' . esc_html__( 'View All', 'pubad-modern' ) . '</a></div>';
 }
 
 function pubad_modern_profile_rows() {

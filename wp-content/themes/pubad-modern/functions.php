@@ -80,6 +80,15 @@ function pubad_modern_language_url( $lang ) {
 	return esc_url( add_query_arg( 'pubad_lang', sanitize_key( $lang ), $url ) );
 }
 
+function pubad_modern_circulars_url() {
+	$url = get_post_type_archive_link( 'circular' );
+	if ( ! $url ) {
+		$url = home_url( '/circulars/' );
+	}
+
+	return esc_url( add_query_arg( 'pubad_lang', pubad_modern_current_language(), $url ) );
+}
+
 function pubad_modern_locale( $locale ) {
 	$languages = pubad_modern_supported_languages();
 	$lang      = pubad_modern_current_language();
@@ -334,6 +343,15 @@ function pubad_modern_translate_menu_title( $title ) {
 	return pubad_modern_translate_text( $title, wp_strip_all_tags( $title ), 'pubad-modern' );
 }
 add_filter( 'nav_menu_item_title', 'pubad_modern_translate_menu_title' );
+
+function pubad_modern_circular_nav_link( $atts, $menu_item ) {
+	if ( isset( $menu_item->title ) && 'circulars' === strtolower( trim( wp_strip_all_tags( $menu_item->title ) ) ) ) {
+		$atts['href'] = pubad_modern_circulars_url();
+	}
+
+	return $atts;
+}
+add_filter( 'nav_menu_link_attributes', 'pubad_modern_circular_nav_link', 10, 2 );
 
 function pubad_modern_setup() {
 	load_theme_textdomain( 'pubad-modern', get_template_directory() . '/languages' );
