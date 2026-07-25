@@ -1,0 +1,55 @@
+.pubad-admin-card {
+	padding: 8px 0;
+}
+.pubad-admin-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+}
+.pubad-admin-grid--three {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.pubad-admin-card label {
+	display: block;
+	margin-bottom: 6px;
+	font-weight: 700;
+}
+.pubad-admin-card label span {
+	color: #d63638;
+}
+.pubad-admin-card .form-control {
+	width: 100%;
+	max-width: 100%;
+	min-height: 38px;
+	border: 1px solid #ced4da;
+	border-radius: 4px;
+	padding: 6px 10px;
+}
+.pubad-admin-card small {
+	display: block;
+	margin-top: 5px;
+	color: #646970;
+}
+.pubad-pdf-field {
+	padding: 14px;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	background: #f8f9fa;
+}
+.pubad-pdf-preview {
+	min-height: 38px;
+	margin-bottom: 10px;
+	padding: 8px 10px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #fff;
+}
+.pubad-pdf-preview em {
+	color: #646970;
+}
+@media (max-width: 900px) {
+	.pubad-admin-grid,
+	.pubad-admin-grid--three {
+		grid-template-columns: 1fr;
+	}
+}

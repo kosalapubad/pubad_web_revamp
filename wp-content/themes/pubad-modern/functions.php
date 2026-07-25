@@ -11,6 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'PUBAD_MODERN_VERSION', '1.0.0' );
 
+require_once get_template_directory() . '/includes/class-pubad-circular-pdf-indexer.php';
+require_once get_template_directory() . '/includes/class-pubad-circulars.php';
+
 function pubad_modern_supported_languages() {
 	return array(
 		'en' => array(
@@ -174,6 +177,29 @@ function pubad_modern_translation_dictionary() {
 			'Vacancies' => 'පුරප්පාඩු',
 			'Acts & Regulations' => 'පනත් සහ රෙගුලාසි',
 			'FAQs' => 'නිතර අසන ප්‍රශ්න',
+			'Circular' => 'චක්‍රලේඛය',
+			'Circular Details' => 'චක්‍රලේඛ විස්තර',
+			'Circular Name' => 'චක්‍රලේඛ නාමය',
+			'Circular Number' => 'චක්‍රලේඛ අංකය',
+			'Circular Date' => 'චක්‍රලේඛ දිනය',
+			'Circular Year' => 'චක්‍රලේඛ වර්ෂය',
+			'Circular Name (English)' => 'චක්‍රලේඛ නාමය (ඉංග්‍රීසි)',
+			'Circular Name (Sinhala)' => 'චක්‍රලේඛ නාමය (සිංහල)',
+			'Circular Name (Tamil)' => 'චක්‍රලේඛ නාමය (දෙමළ)',
+			'English PDF' => 'ඉංග්‍රීසි PDF',
+			'Sinhala PDF' => 'සිංහල PDF',
+			'Tamil PDF' => 'දෙමළ PDF',
+			'PDFs' => 'PDF',
+			'Downloads' => 'බාගත කිරීම්',
+			'Search Circulars' => 'චක්‍රලේඛ සොයන්න',
+			'Search by number, title, date or PDF text' => 'අංකය, නාමය, දිනය හෝ PDF පෙළ අනුව සොයන්න',
+			'Year' => 'වර්ෂය',
+			'All Years' => 'සියලු වර්ෂ',
+			'Reset' => 'නැවත සකසන්න',
+			'No circulars found.' => 'චක්‍රලේඛ හමු නොවීය.',
+			'No PDFs available.' => 'PDF නොමැත.',
+			'Open %s for %s' => '%2$s සඳහා %1$s විවෘත කරන්න',
+			'Search and download ministry circulars by number, date, year, title, or indexed PDF content.' => 'අංකය, දිනය, වර්ෂය, නාමය හෝ සුචිගත PDF අන්තර්ගතය අනුව අමාත්‍යාංශ චක්‍රලේඛ සොයා බාගත කරන්න.',
 		),
 		'ta' => array(
 			'Skip to content' => 'உள்ளடக்கத்திற்குச் செல்லவும்',
@@ -262,6 +288,29 @@ function pubad_modern_translation_dictionary() {
 			'Vacancies' => 'வேலைவாய்ப்புகள்',
 			'Acts & Regulations' => 'சட்டங்கள் மற்றும் விதிமுறைகள்',
 			'FAQs' => 'அடிக்கடி கேட்கப்படும் கேள்விகள்',
+			'Circular' => 'சுற்றறிக்கை',
+			'Circular Details' => 'சுற்றறிக்கை விவரங்கள்',
+			'Circular Name' => 'சுற்றறிக்கை பெயர்',
+			'Circular Number' => 'சுற்றறிக்கை எண்',
+			'Circular Date' => 'சுற்றறிக்கை தேதி',
+			'Circular Year' => 'சுற்றறிக்கை ஆண்டு',
+			'Circular Name (English)' => 'சுற்றறிக்கை பெயர் (ஆங்கிலம்)',
+			'Circular Name (Sinhala)' => 'சுற்றறிக்கை பெயர் (சிங்களம்)',
+			'Circular Name (Tamil)' => 'சுற்றறிக்கை பெயர் (தமிழ்)',
+			'English PDF' => 'ஆங்கில PDF',
+			'Sinhala PDF' => 'சிங்கள PDF',
+			'Tamil PDF' => 'தமிழ் PDF',
+			'PDFs' => 'PDFகள்',
+			'Downloads' => 'பதிவிறக்கங்கள்',
+			'Search Circulars' => 'சுற்றறிக்கைகளை தேடுங்கள்',
+			'Search by number, title, date or PDF text' => 'எண், பெயர், தேதி அல்லது PDF உரை மூலம் தேடுங்கள்',
+			'Year' => 'ஆண்டு',
+			'All Years' => 'அனைத்து ஆண்டுகள்',
+			'Reset' => 'மீட்டமை',
+			'No circulars found.' => 'சுற்றறிக்கைகள் கிடைக்கவில்லை.',
+			'No PDFs available.' => 'PDFகள் இல்லை.',
+			'Open %s for %s' => '%2$s க்கான %1$s ஐ திறக்கவும்',
+			'Search and download ministry circulars by number, date, year, title, or indexed PDF content.' => 'எண், தேதி, ஆண்டு, பெயர் அல்லது குறியிடப்பட்ட PDF உள்ளடக்கம் மூலம் அமைச்சு சுற்றறிக்கைகளை தேடி பதிவிறக்கவும்.',
 		),
 	);
 }
@@ -339,6 +388,14 @@ function pubad_modern_register_cpts() {
 	);
 
 	foreach ( $post_types as $slug => $data ) {
+		$supports = array( 'title', 'editor', 'thumbnail', 'excerpt', 'page-attributes' );
+		$rewrite  = array( 'slug' => str_replace( '_', '-', $slug ) );
+
+		if ( 'circular' === $slug ) {
+			$supports = array( 'title' );
+			$rewrite  = array( 'slug' => 'circulars' );
+		}
+
 		register_post_type(
 			$slug,
 			array(
@@ -352,8 +409,8 @@ function pubad_modern_register_cpts() {
 				'has_archive'  => true,
 				'menu_icon'    => $data[2],
 				'show_in_rest' => true,
-				'supports'     => array( 'title', 'editor', 'thumbnail', 'excerpt', 'page-attributes' ),
-				'rewrite'      => array( 'slug' => str_replace( '_', '-', $slug ) ),
+				'supports'     => $supports,
+				'rewrite'      => $rewrite,
 			)
 		);
 	}
@@ -365,6 +422,18 @@ function pubad_modern_rewrite_flush() {
 	flush_rewrite_rules();
 }
 add_action( 'after_switch_theme', 'pubad_modern_rewrite_flush' );
+
+function pubad_modern_maybe_flush_rewrites() {
+	$version = '20260725_circulars';
+	if ( $version === get_option( 'pubad_modern_rewrite_version' ) ) {
+		return;
+	}
+
+	pubad_modern_register_cpts();
+	flush_rewrite_rules();
+	update_option( 'pubad_modern_rewrite_version', $version );
+}
+add_action( 'init', 'pubad_modern_maybe_flush_rewrites', 20 );
 
 function pubad_modern_hero_slide_metaboxes() {
 	add_meta_box(
