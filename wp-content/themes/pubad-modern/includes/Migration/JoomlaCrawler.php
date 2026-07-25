@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Pubad_Joomla_Crawler {
 	private $source_url;
 	private $timeout = 20;
+	private $listing_page_size = 10;
 
 	public function __construct( $source_url ) {
 		$this->source_url = esc_url_raw( $source_url );
@@ -25,14 +26,10 @@ class Pubad_Joomla_Crawler {
 	}
 
 	public function latest( $limit, $offset = 0 ) {
-		$html = $this->fetch( $this->source_url );
-		if ( is_wp_error( $html ) ) {
-			return $html;
+		$items = $this->fetch_listing_batch( max( 1, absint( $limit ) ), max( 0, absint( $offset ) ) );
+		if ( is_wp_error( $items ) ) {
+			return $items;
 		}
-
-		$items = $this->parse_listing( $html, $this->source_url );
-		$items = $this->group_by_number( $items );
-		$items = array_slice( $items, max( 0, absint( $offset ) ), max( 1, absint( $limit ) ), true );
 
 		foreach ( $items as $number => $item ) {
 			foreach ( array( 'en', 'si', 'ta' ) as $lang ) {
@@ -45,6 +42,44 @@ class Pubad_Joomla_Crawler {
 		}
 
 		return array_values( $items );
+	}
+
+	private function fetch_listing_batch( $limit, $offset ) {
+		$items      = array();
+		$page_start = $offset - ( $offset % $this->listing_page_size );
+		$skip       = $offset - $page_start;
+
+		while ( count( $items ) < $limit ) {
+			$url  = add_query_arg( 'limitstart', $page_start, $this->source_url );
+			$html = $this->fetch( $url );
+			if ( is_wp_error( $html ) ) {
+				return $html;
+			}
+
+			$page_items = $this->group_by_number( $this->parse_listing( $html, $url ) );
+			if ( ! $page_items ) {
+				break;
+			}
+
+			if ( $skip ) {
+				$page_items = array_slice( $page_items, $skip, null, true );
+				$skip       = 0;
+			}
+
+			foreach ( $page_items as $number => $item ) {
+				if ( ! isset( $items[ $number ] ) ) {
+					$items[ $number ] = $item;
+				}
+
+				if ( count( $items ) >= $limit ) {
+					break;
+				}
+			}
+
+			$page_start += $this->listing_page_size;
+		}
+
+		return $items;
 	}
 
 	private function fetch_detail_language( $item, $lang ) {

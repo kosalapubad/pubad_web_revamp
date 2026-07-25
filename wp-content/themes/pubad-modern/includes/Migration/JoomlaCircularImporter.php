@@ -41,6 +41,11 @@ class Pubad_Joomla_Circular_Importer {
 		}
 
 		$this->last_import_count = count( $items );
+		if ( ! $items ) {
+			$this->logger->add( 'skipped', '', __( 'No circulars found for this batch offset.', 'pubad-modern' ), 'crawl' );
+			return $this->logger;
+		}
+
 		foreach ( $items as $item ) {
 			try {
 				$this->mapper->import( $item );
