@@ -19,6 +19,10 @@ class Pubad_Circular_Mapper {
 	}
 
 	public function import( $item ) {
+		if ( ! defined( 'PUBAD_CIRCULAR_IMPORTING' ) ) {
+			define( 'PUBAD_CIRCULAR_IMPORTING', true );
+		}
+
 		if ( empty( $item['number'] ) ) {
 			$this->logger->add( 'failed', '', __( 'Missing circular number.', 'pubad-modern' ), 'validate' );
 			return false;
@@ -126,6 +130,7 @@ class Pubad_Circular_Mapper {
 		wp_update_post(
 			array(
 				'ID'         => $post_id,
+				'post_status' => 'publish',
 				'post_title' => sanitize_text_field( $names['en'] ? $names['en'] : $item['number'] ),
 				'post_name'  => sanitize_title( $item['number'] . '-' . ( $names['en'] ? $names['en'] : 'circular' ) ),
 			)

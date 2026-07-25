@@ -412,12 +412,14 @@ function pubad_modern_register_cpts() {
 	);
 
 	foreach ( $post_types as $slug => $data ) {
-		$supports = array( 'title', 'editor', 'thumbnail', 'excerpt', 'page-attributes' );
-		$rewrite  = array( 'slug' => str_replace( '_', '-', $slug ) );
+		$supports    = array( 'title', 'editor', 'thumbnail', 'excerpt', 'page-attributes' );
+		$rewrite     = array( 'slug' => str_replace( '_', '-', $slug ) );
+		$has_archive = true;
 
 		if ( 'circular' === $slug ) {
-			$supports = array( 'title' );
-			$rewrite  = array( 'slug' => 'circulars' );
+			$supports    = array( 'title' );
+			$rewrite     = array( 'slug' => 'circulars' );
+			$has_archive = 'circulars';
 		}
 
 		register_post_type(
@@ -430,7 +432,7 @@ function pubad_modern_register_cpts() {
 					'edit_item'     => sprintf( __( 'Edit %s', 'pubad-modern' ), $data[1] ),
 				),
 				'public'       => true,
-				'has_archive'  => true,
+				'has_archive'  => $has_archive,
 				'menu_icon'    => $data[2],
 				'show_in_rest' => true,
 				'supports'     => $supports,
@@ -448,7 +450,7 @@ function pubad_modern_rewrite_flush() {
 add_action( 'after_switch_theme', 'pubad_modern_rewrite_flush' );
 
 function pubad_modern_maybe_flush_rewrites() {
-	$version = '20260725_circulars';
+	$version = '20260725_circulars_archive';
 	if ( $version === get_option( 'pubad_modern_rewrite_version' ) ) {
 		return;
 	}

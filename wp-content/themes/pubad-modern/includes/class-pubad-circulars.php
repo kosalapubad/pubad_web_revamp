@@ -112,6 +112,10 @@ class Pubad_Circulars {
 			return $data;
 		}
 
+		if ( defined( 'PUBAD_CIRCULAR_IMPORTING' ) && PUBAD_CIRCULAR_IMPORTING ) {
+			return $data;
+		}
+
 		$required_text = array(
 			'pubad_circular_number',
 			'pubad_circular_date',
