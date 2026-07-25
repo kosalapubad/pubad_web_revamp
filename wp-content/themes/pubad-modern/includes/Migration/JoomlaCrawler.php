@@ -147,8 +147,10 @@ class Pubad_Joomla_Crawler {
 			$item['names'][ $lang ] = $detail['name'];
 		}
 
-		foreach ( $detail['pdfs'] as $pdf_lang => $url ) {
-			$item['pdfs'][ $pdf_lang ] = $url;
+		if ( ! empty( $detail['pdfs'][ $lang ] ) ) {
+			$item['pdfs'][ $lang ] = $detail['pdfs'][ $lang ];
+		} elseif ( 1 === count( $detail['pdfs'] ) ) {
+			$item['pdfs'][ $lang ] = reset( $detail['pdfs'] );
 		}
 
 		return $item;
@@ -218,11 +220,24 @@ class Pubad_Joomla_Crawler {
 
 	private function extract_title( DOMDocument $dom, $fallback_text ) {
 		$xpath = new DOMXPath( $dom );
+
+		$table_title = $this->extract_table_value(
+			$xpath,
+			array(
+				'Circular Name',
+				'චක්‍රලේඛ',
+				'சுற்றறிக்கையின் பெயர்',
+			)
+		);
+		if ( $table_title ) {
+			return $table_title;
+		}
+
 		foreach ( array( '//h1', '//h2', '//h3', '//*[contains(@class,"page-header")]' ) as $query ) {
 			$nodes = $xpath->query( $query );
 			foreach ( $nodes as $node ) {
 				$title = $this->node_text( $node );
-				if ( $title && false === stripos( $title, 'Circulars' ) ) {
+				if ( $title && ! $this->is_generic_title( $title ) ) {
 					return $title;
 				}
 			}
@@ -231,7 +246,7 @@ class Pubad_Joomla_Crawler {
 		$lines = preg_split( '/\s{2,}|\r|\n/', $fallback_text );
 		foreach ( $lines as $line ) {
 			$line = trim( $line );
-			if ( strlen( $line ) > 8 && false === stripos( $line, '.pdf' ) ) {
+			if ( strlen( $line ) > 8 && false === stripos( $line, '.pdf' ) && ! $this->is_generic_title( $line ) ) {
 				return $line;
 			}
 		}
@@ -239,14 +254,58 @@ class Pubad_Joomla_Crawler {
 		return '';
 	}
 
+	private function extract_table_value( DOMXPath $xpath, $labels ) {
+		$rows = $xpath->query( '//table[contains(@class,"namePanelin")]//tr|//tr' );
+		foreach ( $rows as $row ) {
+			$cells = $xpath->query( './td', $row );
+			if ( $cells->length < 2 ) {
+				continue;
+			}
+
+			$label = $this->node_text( $cells->item( 0 ) );
+			foreach ( $labels as $expected ) {
+				if ( $this->contains_text( $label, $expected ) ) {
+					return $this->node_text( $cells->item( 1 ) );
+				}
+			}
+		}
+
+		return '';
+	}
+
+	private function is_generic_title( $title ) {
+		$generic = array(
+			'Circulars',
+			'Circular Manager',
+			'චක්‍රලේඛ',
+			'சுற்றறிக்கைகள்',
+		);
+
+		foreach ( $generic as $value ) {
+			if ( 0 === strcasecmp( trim( $title ), $value ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private function contains_text( $haystack, $needle ) {
+		if ( function_exists( 'mb_stripos' ) ) {
+			return false !== mb_stripos( $haystack, $needle, 0, 'UTF-8' );
+		}
+
+		return false !== stripos( $haystack, $needle );
+	}
+
 	private function detect_language( $text ) {
-		if ( false !== strpos( $text, 'sinhala' ) || false !== strpos( $text, 'sin' ) || false !== strpos( $text, 'si_' ) ) {
+		if ( preg_match( '#(?:/s/|-s\.pdf|_s\.pdf|sinhala|sin|si_|සිංහල|සින්හල|சிங்கள)#iu', $text ) ) {
 			return 'si';
 		}
-		if ( false !== strpos( $text, 'tamil' ) || false !== strpos( $text, 'tam' ) || false !== strpos( $text, 'ta_' ) ) {
+		if ( preg_match( '#(?:/t/|-t\.pdf|_t\.pdf|tamil|tam|ta_|දෙමළ|தமிழ)#iu', $text ) ) {
 			return 'ta';
 		}
-		if ( false !== strpos( $text, 'english' ) || false !== strpos( $text, 'eng' ) || false !== strpos( $text, 'en_' ) ) {
+		if ( preg_match( '#(?:/e/|-e\.pdf|_e\.pdf|english|eng|en_|ඉංග්‍රීසි|ஆங்கில)#iu', $text ) ) {
 			return 'en';
 		}
 		return 'en';
