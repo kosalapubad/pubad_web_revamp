@@ -13,6 +13,12 @@ define( 'PUBAD_MODERN_VERSION', '1.0.0' );
 
 require_once get_template_directory() . '/includes/class-pubad-circular-pdf-indexer.php';
 require_once get_template_directory() . '/includes/class-pubad-circulars.php';
+require_once get_template_directory() . '/includes/Migration/ImportLogger.php';
+require_once get_template_directory() . '/includes/Migration/JoomlaCrawler.php';
+require_once get_template_directory() . '/includes/Migration/PdfDownloader.php';
+require_once get_template_directory() . '/includes/Migration/CircularMapper.php';
+require_once get_template_directory() . '/includes/Migration/JoomlaCircularImporter.php';
+require_once get_template_directory() . '/includes/Migration/AdminImporterPage.php';
 
 function pubad_modern_supported_languages() {
 	return array(

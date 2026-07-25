@@ -290,6 +290,7 @@ class Pubad_Circulars {
 		}
 		$text = trim( $text );
 		update_post_meta( $post_id, self::META_PDF_TEXT, $text );
+		update_post_meta( $post_id, '_pdf_text', $text );
 		return $text;
 	}
 
@@ -323,7 +324,14 @@ class Pubad_Circulars {
 
 		$text = Pubad_Circular_PDF_Indexer::extract_attachment_text( $attachment_id );
 		update_post_meta( $attachment_id, self::ATTACHMENT_PDF_TEXT, $text );
+		update_post_meta( $attachment_id, '_pdf_text', $text );
 		self::refresh_circulars_for_pdf( $attachment_id );
+	}
+
+	public static function reindex( $post_id ) {
+		$fields   = self::get_fields( $post_id );
+		$pdf_text = self::update_pdf_index( $post_id, array( $fields['pdf_en'], $fields['pdf_si'], $fields['pdf_ta'] ) );
+		self::update_search_index( $post_id, $pdf_text );
 	}
 
 	private static function refresh_circulars_for_pdf( $attachment_id ) {
