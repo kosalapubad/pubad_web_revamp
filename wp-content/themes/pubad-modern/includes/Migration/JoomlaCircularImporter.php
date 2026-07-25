@@ -11,11 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Pubad_Joomla_Circular_Importer {
 	const DEFAULT_SOURCE = 'https://pubad.gov.lk/web/index.php?option=com_circular&view=circulars&Itemid=176&lang=en';
-	const DEFAULT_LIMIT  = 20;
+	const DEFAULT_LIMIT  = 10;
 
 	private $crawler;
 	private $logger;
 	private $mapper;
+	private $last_import_count = 0;
 
 	public function __construct( $source_url, Pubad_Import_Logger $logger ) {
 		$this->crawler = new Pubad_Joomla_Crawler( $source_url );
@@ -27,17 +28,19 @@ class Pubad_Joomla_Circular_Importer {
 		return $this->crawler->analyze_source();
 	}
 
-	public function preview( $limit ) {
-		return $this->crawler->latest( $limit );
+	public function preview( $limit, $offset = 0 ) {
+		return $this->crawler->latest( $limit, $offset );
 	}
 
-	public function import( $limit ) {
-		$items = $this->crawler->latest( $limit );
+	public function import( $limit, $offset = 0 ) {
+		$this->last_import_count = 0;
+		$items = $this->crawler->latest( $limit, $offset );
 		if ( is_wp_error( $items ) ) {
 			$this->logger->add( 'failed', '', $items->get_error_message(), 'crawl' );
 			return $this->logger;
 		}
 
+		$this->last_import_count = count( $items );
 		foreach ( $items as $item ) {
 			try {
 				$this->mapper->import( $item );
@@ -47,5 +50,9 @@ class Pubad_Joomla_Circular_Importer {
 		}
 
 		return $this->logger;
+	}
+
+	public function get_last_import_count() {
+		return $this->last_import_count;
 	}
 }

@@ -24,15 +24,15 @@ class Pubad_Joomla_Crawler {
 		);
 	}
 
-	public function latest( $limit ) {
+	public function latest( $limit, $offset = 0 ) {
 		$html = $this->fetch( $this->source_url );
 		if ( is_wp_error( $html ) ) {
 			return $html;
 		}
 
 		$items = $this->parse_listing( $html, $this->source_url );
-		$items = array_slice( $items, 0, max( 1, absint( $limit ) ) );
 		$items = $this->group_by_number( $items );
+		$items = array_slice( $items, max( 0, absint( $offset ) ), max( 1, absint( $limit ) ), true );
 
 		foreach ( $items as $number => $item ) {
 			foreach ( array( 'en', 'si', 'ta' ) as $lang ) {

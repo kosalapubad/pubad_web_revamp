@@ -10,8 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Pubad_Admin_Importer_Page {
-	const MENU_SLUG = 'pubad-circular-importer';
-	const LOG_KEY   = 'pubad_circular_import_log_';
+	const MENU_SLUG  = 'pubad-circular-importer';
+	const LOG_KEY    = 'pubad_circular_import_log_';
+	const OFFSET_KEY = 'pubad_circular_import_offset';
 
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
@@ -36,6 +37,7 @@ class Pubad_Admin_Importer_Page {
 		$source = isset( $_POST['source_url'] ) ? esc_url_raw( wp_unslash( $_POST['source_url'] ) ) : Pubad_Joomla_Circular_Importer::DEFAULT_SOURCE;
 		$limit  = isset( $_POST['import_limit'] ) ? max( 1, absint( $_POST['import_limit'] ) ) : Pubad_Joomla_Circular_Importer::DEFAULT_LIMIT;
 		$action = isset( $_POST['pubad_importer_action'] ) ? sanitize_key( wp_unslash( $_POST['pubad_importer_action'] ) ) : '';
+		$offset = self::current_offset();
 		$items  = null;
 		$logger = null;
 		$notice = '';
@@ -46,13 +48,21 @@ class Pubad_Admin_Importer_Page {
 			$importer = new Pubad_Joomla_Circular_Importer( $source, $logger );
 
 			if ( 'preview' === $action ) {
-				$items = $importer->preview( $limit );
+				$items = $importer->preview( $limit, $offset );
 			}
 
 			if ( 'import' === $action ) {
-				$logger = $importer->import( $limit );
+				$logger = $importer->import( $limit, $offset );
 				update_user_meta( get_current_user_id(), self::LOG_KEY, $logger->get_rows() );
+				$offset += $importer->get_last_import_count();
+				update_option( self::OFFSET_KEY, $offset, false );
 				$notice = __( 'Import completed. Review the log below.', 'pubad-modern' );
+			}
+
+			if ( 'reset_cursor' === $action ) {
+				$offset = 0;
+				update_option( self::OFFSET_KEY, $offset, false );
+				$notice = __( 'Import cursor reset. The next import will start from the latest circulars again.', 'pubad-modern' );
 			}
 		} else {
 			$logger   = new Pubad_Import_Logger();
@@ -67,6 +77,7 @@ class Pubad_Admin_Importer_Page {
 				<div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div>
 			<?php endif; ?>
 			<div class="notice notice-info"><p><?php echo esc_html( $analysis['method'] ); ?></p></div>
+			<p><strong><?php esc_html_e( 'Next batch starts after circular', 'pubad-modern' ); ?>:</strong> <?php echo esc_html( $offset ); ?></p>
 
 			<form method="post">
 				<?php wp_nonce_field( 'pubad_circular_importer' ); ?>
@@ -81,8 +92,9 @@ class Pubad_Admin_Importer_Page {
 					</tr>
 				</table>
 				<p>
-					<button class="button" name="pubad_importer_action" value="preview" type="submit"><?php esc_html_e( 'Preview Latest Circulars', 'pubad-modern' ); ?></button>
-					<button class="button button-primary" name="pubad_importer_action" value="import" type="submit"><?php esc_html_e( 'Start Import', 'pubad-modern' ); ?></button>
+					<button class="button" name="pubad_importer_action" value="preview" type="submit"><?php esc_html_e( 'Preview Next Batch', 'pubad-modern' ); ?></button>
+					<button class="button button-primary" name="pubad_importer_action" value="import" type="submit"><?php esc_html_e( 'Import Next Batch', 'pubad-modern' ); ?></button>
+					<button class="button" name="pubad_importer_action" value="reset_cursor" type="submit"><?php esc_html_e( 'Reset Batch Cursor', 'pubad-modern' ); ?></button>
 				</p>
 			</form>
 
@@ -90,6 +102,37 @@ class Pubad_Admin_Importer_Page {
 			<?php self::render_log( $logger ); ?>
 		</div>
 		<?php
+	}
+
+	private static function current_offset() {
+		$offset = get_option( self::OFFSET_KEY, null );
+		if ( null !== $offset && false !== $offset ) {
+			return max( 0, absint( $offset ) );
+		}
+
+		return self::imported_circular_count();
+	}
+
+	private static function imported_circular_count() {
+		$query = new WP_Query(
+			array(
+				'post_type'              => Pubad_Circulars::POST_TYPE,
+				'post_status'            => 'any',
+				'posts_per_page'         => 1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => false,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'meta_query'             => array(
+					array(
+						'key'     => Pubad_Circulars::META_NUMBER,
+						'compare' => 'EXISTS',
+					),
+				),
+			)
+		);
+
+		return absint( $query->found_posts );
 	}
 
 	private static function render_preview( $items ) {
@@ -102,7 +145,7 @@ class Pubad_Admin_Importer_Page {
 			return;
 		}
 		?>
-		<h2><?php esc_html_e( 'Preview Latest Circulars', 'pubad-modern' ); ?></h2>
+		<h2><?php esc_html_e( 'Preview Next Batch', 'pubad-modern' ); ?></h2>
 		<table class="widefat striped">
 			<thead><tr><th><?php esc_html_e( 'Circular Number', 'pubad-modern' ); ?></th><th><?php esc_html_e( 'Circular Name', 'pubad-modern' ); ?></th><th><?php esc_html_e( 'Date', 'pubad-modern' ); ?></th><th><?php esc_html_e( 'Language', 'pubad-modern' ); ?></th><th><?php esc_html_e( 'PDF Available', 'pubad-modern' ); ?></th><th><?php esc_html_e( 'Status', 'pubad-modern' ); ?></th></tr></thead>
 			<tbody>
