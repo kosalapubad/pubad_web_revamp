@@ -26,6 +26,91 @@
 		});
 	});
 
+	document.querySelectorAll('[data-circular-live-search]').forEach(function (form) {
+		var input = form.querySelector('input[name="circular_search"]');
+		var year = form.querySelector('select[name="circular_year"]');
+		var list = document.querySelector('.circular-list');
+		var timer;
+		var controller;
+
+		function buildUrl() {
+			var data = new window.FormData(form);
+			var params = new window.URLSearchParams();
+
+			data.forEach(function (value, key) {
+				if (String(value).trim() !== '') {
+					params.set(key, value);
+				}
+			});
+
+			return form.action + (params.toString() ? '?' + params.toString() : '');
+		}
+
+		function updateResults(pushState) {
+			var url = buildUrl();
+
+			if (!list) {
+				window.location.href = url;
+				return;
+			}
+
+			if (controller) {
+				controller.abort();
+			}
+
+			controller = new window.AbortController();
+			form.classList.add('is-loading');
+
+			window.fetch(url, {
+				credentials: 'same-origin',
+				signal: controller.signal
+			})
+				.then(function (response) {
+					return response.text();
+				})
+				.then(function (html) {
+					var doc = new window.DOMParser().parseFromString(html, 'text/html');
+					var nextList = doc.querySelector('.circular-list');
+					if (nextList) {
+						list.innerHTML = nextList.innerHTML;
+					}
+					if (pushState) {
+						window.history.replaceState({}, '', url);
+					}
+				})
+				.catch(function (error) {
+					if (error.name !== 'AbortError') {
+						window.location.href = url;
+					}
+				})
+				.finally(function () {
+					form.classList.remove('is-loading');
+				});
+		}
+
+		function queueUpdate() {
+			window.clearTimeout(timer);
+			timer = window.setTimeout(function () {
+				updateResults(true);
+			}, 350);
+		}
+
+		form.addEventListener('submit', function (event) {
+			event.preventDefault();
+			updateResults(true);
+		});
+
+		if (input) {
+			input.addEventListener('input', queueUpdate);
+		}
+
+		if (year) {
+			year.addEventListener('change', function () {
+				updateResults(true);
+			});
+		}
+	});
+
 	var toggle = document.querySelector('.menu-toggle');
 	var menu = document.querySelector('.primary-menu');
 	if (toggle && menu) {

@@ -932,7 +932,7 @@ body.nav-is-fixed {
 }
 .circular-filter {
 	display: grid;
-	grid-template-columns: minmax(240px, 1fr) 180px 110px auto;
+	grid-template-columns: minmax(240px, 1fr) 180px auto;
 	align-items: end;
 	gap: 14px;
 	margin-bottom: 22px;
@@ -941,6 +941,9 @@ body.nav-is-fixed {
 	border: 1px solid var(--line);
 	border-radius: 6px;
 	box-shadow: 0 7px 22px rgba(0, 44, 88, .06);
+}
+.circular-filter.is-loading {
+	opacity: .72;
 }
 .circular-filter label {
 	display: grid;

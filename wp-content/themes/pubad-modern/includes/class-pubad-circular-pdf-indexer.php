@@ -25,6 +25,11 @@ class Pubad_Circular_PDF_Indexer {
 			return $text;
 		}
 
+		$text = self::extract_with_pdftotext( $file );
+		if ( '' !== $text ) {
+			return $text;
+		}
+
 		return self::extract_basic_text( $file );
 	}
 
@@ -45,6 +50,24 @@ class Pubad_Circular_PDF_Indexer {
 		} catch ( Exception $e ) {
 			return '';
 		}
+	}
+
+	private static function extract_with_pdftotext( $file ) {
+		if ( ! function_exists( 'shell_exec' ) ) {
+			return '';
+		}
+
+		$binary = trim( (string) shell_exec( 'command -v pdftotext 2>/dev/null' ) );
+		if ( '' === $binary ) {
+			return '';
+		}
+
+		$output = shell_exec( escapeshellcmd( $binary ) . ' -layout ' . escapeshellarg( $file ) . ' - 2>/dev/null' );
+		if ( ! is_string( $output ) || '' === trim( $output ) ) {
+			return '';
+		}
+
+		return self::normalize_text( $output );
 	}
 
 	private static function extract_basic_text( $file ) {

@@ -456,16 +456,6 @@ class Pubad_Circulars {
 	}
 
 	public static function search_join( $join, $query ) {
-		global $wpdb;
-
-		if ( ! self::is_circular_search( $query ) ) {
-			return $join;
-		}
-
-		$join .= $wpdb->prepare(
-			" LEFT JOIN {$wpdb->postmeta} pubad_circular_search_meta ON ({$wpdb->posts}.ID = pubad_circular_search_meta.post_id AND pubad_circular_search_meta.meta_key = %s)",
-			self::META_SEARCH_INDEX
-		);
 		return $join;
 	}
 
@@ -481,15 +471,45 @@ class Pubad_Circulars {
 			return $where;
 		}
 
-		$like      = '%' . $wpdb->esc_like( $search ) . '%';
-		$where .= $wpdb->prepare(
-			" AND (
-				{$wpdb->posts}.post_title LIKE %s
-				OR pubad_circular_search_meta.meta_value LIKE %s
-			)",
-			$like,
-			$like
+		$tokens = self::search_tokens( $search );
+		if ( ! $tokens ) {
+			return $where;
+		}
+
+		$meta_keys = array(
+			self::META_NUMBER,
+			self::META_DATE,
+			self::META_YEAR,
+			self::META_NAME_EN,
+			self::META_NAME_SI,
+			self::META_NAME_TA,
+			self::META_PDF_TEXT,
+			self::META_SEARCH_INDEX,
+			'_pdf_text',
 		);
+
+		foreach ( $tokens as $token ) {
+			$like             = '%' . $wpdb->esc_like( $token ) . '%';
+			$meta_key_holders = implode( ',', array_fill( 0, count( $meta_keys ), '%s' ) );
+			$params           = array_merge(
+				array( $like ),
+				$meta_keys,
+				array( $like )
+			);
+
+			$where .= $wpdb->prepare(
+				" AND (
+					{$wpdb->posts}.post_title LIKE %s
+					OR EXISTS (
+						SELECT 1 FROM {$wpdb->postmeta} pubad_search_pm
+						WHERE pubad_search_pm.post_id = {$wpdb->posts}.ID
+						AND pubad_search_pm.meta_key IN ($meta_key_holders)
+						AND pubad_search_pm.meta_value LIKE %s
+					)
+				)",
+				$params
+			);
+		}
 
 		return $where;
 	}
@@ -500,6 +520,23 @@ class Pubad_Circulars {
 
 	private static function is_circular_search( $query ) {
 		return ! is_admin() && $query->is_main_query() && $query->is_post_type_archive( self::POST_TYPE ) && $query->get( 'pubad_circular_search' );
+	}
+
+	private static function search_tokens( $search ) {
+		$search = trim( preg_replace( '/\s+/u', ' ', $search ) );
+		if ( '' === $search ) {
+			return array();
+		}
+
+		$tokens = preg_split( '/\s+/u', $search );
+		$tokens = array_filter(
+			array_map( 'trim', $tokens ),
+			function ( $token ) {
+				return '' !== $token;
+			}
+		);
+
+		return array_slice( array_values( array_unique( $tokens ) ), 0, 8 );
 	}
 }
 

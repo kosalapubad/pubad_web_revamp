@@ -18,11 +18,11 @@ $years        = Pubad_Circulars::get_years();
 		<p><?php esc_html_e( 'Search and download ministry circulars by number, date, year, title, or indexed PDF content.', 'pubad-modern' ); ?></p>
 	</div>
 
-	<form class="circular-filter" method="get" action="<?php echo esc_url( get_post_type_archive_link( 'circular' ) ); ?>">
+	<form class="circular-filter" method="get" action="<?php echo esc_url( get_post_type_archive_link( 'circular' ) ); ?>" data-circular-live-search>
 		<input type="hidden" name="pubad_lang" value="<?php echo esc_attr( pubad_modern_current_language() ); ?>">
 		<label>
 			<span><?php esc_html_e( 'Search Circulars', 'pubad-modern' ); ?></span>
-			<input type="search" name="circular_search" value="<?php echo esc_attr( $search_value ); ?>" placeholder="<?php esc_attr_e( 'Search by number, title, date or PDF text', 'pubad-modern' ); ?>">
+			<input type="search" name="circular_search" value="<?php echo esc_attr( $search_value ); ?>" placeholder="<?php esc_attr_e( 'Search by number, title, date or PDF text', 'pubad-modern' ); ?>" autocomplete="off">
 		</label>
 		<label>
 			<span><?php esc_html_e( 'Year', 'pubad-modern' ); ?></span>
@@ -33,7 +33,6 @@ $years        = Pubad_Circulars::get_years();
 				<?php endforeach; ?>
 			</select>
 		</label>
-		<button type="submit"><?php esc_html_e( 'Search', 'pubad-modern' ); ?></button>
 		<a class="circular-filter__reset" href="<?php echo esc_url( get_post_type_archive_link( 'circular' ) ); ?>"><?php esc_html_e( 'Reset', 'pubad-modern' ); ?></a>
 	</form>
 
