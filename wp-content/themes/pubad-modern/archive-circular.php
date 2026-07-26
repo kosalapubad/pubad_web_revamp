@@ -33,7 +33,6 @@ $years        = Pubad_Circulars::get_years();
 				<?php endforeach; ?>
 			</select>
 		</label>
-		<a class="circular-filter__reset" href="<?php echo esc_url( get_post_type_archive_link( 'circular' ) ); ?>"><?php esc_html_e( 'Reset', 'pubad-modern' ); ?></a>
 	</form>
 
 	<div class="circular-list">
@@ -68,7 +67,14 @@ $years        = Pubad_Circulars::get_years();
 					</div>
 				</article>
 			<?php endwhile; ?>
-			<?php the_posts_pagination(); ?>
+			<?php
+			the_posts_pagination(
+				array(
+					'prev_text' => __( 'Previous', 'pubad-modern' ),
+					'next_text' => __( 'Next', 'pubad-modern' ),
+				)
+			);
+			?>
 		<?php else : ?>
 			<div class="entry-card">
 				<p><?php esc_html_e( 'No circulars found.', 'pubad-modern' ); ?></p>

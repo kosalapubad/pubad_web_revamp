@@ -932,7 +932,7 @@ body.nav-is-fixed {
 }
 .circular-filter {
 	display: grid;
-	grid-template-columns: minmax(240px, 1fr) 180px auto;
+	grid-template-columns: minmax(240px, 1fr) 180px;
 	align-items: end;
 	gap: 14px;
 	margin-bottom: 22px;
@@ -963,8 +963,7 @@ body.nav-is-fixed {
 	background: #fff;
 	color: var(--text);
 }
-.circular-filter button,
-.circular-filter__reset {
+.circular-filter button {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -977,12 +976,6 @@ body.nav-is-fixed {
 	background: var(--blue-800);
 	color: #fff;
 	cursor: pointer;
-}
-.circular-filter__reset {
-	padding: 0 12px;
-	border: 1px solid var(--line);
-	background: #fff;
-	color: var(--blue-800);
 }
 .circular-list {
 	display: grid;
@@ -998,6 +991,12 @@ body.nav-is-fixed {
 	border: 1px solid rgba(216, 225, 236, .82);
 	border-radius: 6px;
 	box-shadow: 0 7px 22px rgba(0, 44, 88, .06);
+	transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.circular-item:hover {
+	transform: translateY(-3px);
+	border-color: rgba(0, 74, 143, .28);
+	box-shadow: 0 14px 32px rgba(0, 44, 88, .12);
 }
 .circular-item h2 {
 	margin: 0 0 10px;
@@ -1045,6 +1044,48 @@ body.nav-is-fixed {
 	width: 18px;
 	height: 18px;
 	color: var(--red);
+}
+.circular-list .navigation.pagination {
+	margin-top: 14px;
+}
+.circular-list .nav-links {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+}
+.circular-list .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 40px;
+	height: 40px;
+	padding: 0 13px;
+	border: 1px solid rgba(0, 74, 143, .18);
+	border-radius: 6px;
+	background: #fff;
+	color: var(--blue-800);
+	font-weight: 800;
+	box-shadow: 0 5px 14px rgba(0, 44, 88, .06);
+	transition: transform .16s ease, box-shadow .16s ease, background-color .16s ease, border-color .16s ease;
+}
+.circular-list a.page-numbers:hover {
+	transform: translateY(-2px);
+	border-color: rgba(0, 74, 143, .34);
+	background: #eef6ff;
+	box-shadow: 0 9px 20px rgba(0, 44, 88, .1);
+}
+.circular-list .page-numbers.current {
+	border-color: var(--blue-800);
+	background: var(--blue-800);
+	color: #fff;
+}
+.circular-list .page-numbers.dots {
+	border-color: transparent;
+	background: transparent;
+	box-shadow: none;
+	color: var(--muted);
 }
 .circular-single h1 {
 	color: var(--blue-900);
